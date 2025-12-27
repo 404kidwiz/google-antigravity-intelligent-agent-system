@@ -1,0 +1,12 @@
+# Intelligently ignore unnecessary files
+.DS_Store
+*.log
+*.tmp
+.cache/
+node_modules/
+.env
+.env.local
+.vscode/
+.idea/
+backup/
+*.backup.*
