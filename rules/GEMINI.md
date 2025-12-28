@@ -1,6 +1,7 @@
-# GLOBAL AI RULES & BEHAVIORAL PROTOCOLS
+# GLOBAL AI RULES & BEHAVIORAL PROTOCOLS - v2.0 ENHANCED
 
 > **Master Configuration** - These rules apply globally across all projects and workspaces.
+> **Enhanced v2.0** - Now with hierarchical orchestration, persistent memory, and real-time analytics.
 
 ---
 
