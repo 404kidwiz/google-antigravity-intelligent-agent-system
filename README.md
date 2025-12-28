@@ -58,20 +58,37 @@ intelligent-agent-system/
 
 ## 🚀 Quick Start
 
-### Option 1: Automatic Setup (Recommended)
+### Option 1: Universal One-Command Installation (Recommended)
 ```bash
-curl -sSL https://raw.githubusercontent.com/your-repo/intelligent-agent-system/main/setup/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/404kidwiz/google-antigravity-intelligent-agent-system/main/install.sh | bash
 ```
 
-### Option 2: Manual Setup
+### Option 2: Download and Run Installer
+```bash
+# Download installer
+wget -qO- https://raw.githubusercontent.com/404kidwiz/google-antigravity-intelligent-agent-system/main/install.sh
+
+# Run installer
+chmod +x install.sh
+./install.sh
+```
+
+### Option 3: Clone and Install
 ```bash
 # Clone the repository
-git clone https://github.com/your-repo/intelligent-agent-system.git
-cd intelligent-agent-system
+git clone https://github.com/404kidwiz/google-antigravity-intelligent-agent-system.git
+cd google-antigravity-intelligent-agent-system
 
-# Run setup script
-chmod +x setup/install.sh
-./setup/install.sh
+# Run installer
+chmod +x install.sh
+./install.sh
+```
+
+### Option 4: Development Mode Installation
+```bash
+git clone https://github.com/404kidwiz/google-antigravity-intelligent-agent-system.git
+cd google-antigravity-intelligent-agent-system
+./install.sh --dev
 ```
 
 ## 🎯 What It Does
