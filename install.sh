@@ -6,6 +6,30 @@
 
 set -e
 
+# Handle execution mode - if script is being piped to bash
+if [ -t 0 ]; then
+    # Check if we have arguments that don't match our options
+    INSTALLER_MODE="install"
+    REQUEST=""
+    for arg in "$@"; do
+        case $arg in
+            --skip-deps|--dev|--quiet|--force|--help)
+                # Known option - continue with install mode
+                ;;
+            *)
+                # Unknown option - treat as request
+                REQUEST="$arg"
+                INSTALLER_MODE="run"
+                break
+                ;;
+        esac
+    done
+else
+    # File execution mode
+    INSTALLER_MODE="install"
+    REQUEST="$@"
+fi
+
 # Colors for output
 RED='\033[0;31m'
 GREEN='\033[0;32m'
