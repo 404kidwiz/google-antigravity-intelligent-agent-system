@@ -304,19 +304,24 @@ class MetaOrchestrator:
                 "estimated_time": 15
             })
         
-        # Add aggregation task
-        subtasks.append({
+        # Create aggregation task first
+        aggregation_task = {
             "level": 2,
             "type": "aggregation",
             "expert": "backend-architect",
             "description": "Aggregate results from concurrent expert analysis",
-            "dependencies": [s["id"] for s in subtasks[:-1]],
+            "dependencies": [],  # Will be set after IDs are assigned
             "estimated_time": 10
-        })
+        }
         
-        # Assign IDs
+        # Assign IDs and then add aggregation task
         for i, subtask in enumerate(subtasks):
             subtask["id"] = f"concurrent_{i+1}"
+        
+        # Update aggregation task dependencies
+        if subtasks:
+            aggregation_task["dependencies"] = [s["id"] for s in subtasks]
+            subtasks.append(aggregation_task)
         
         return subtasks
     
