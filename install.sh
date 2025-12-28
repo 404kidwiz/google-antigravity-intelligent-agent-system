@@ -2,6 +2,7 @@
 
 # UNIVERSAL INSTALLER - Enhanced Intelligent Agent System v2.0
 # Works on macOS, Linux, and Windows (WSL)
+# FIXED VERSION - Correct user identification and repository URLs
 
 set -e
 
@@ -20,16 +21,24 @@ INSTALL_DIR="$HOME/.gemini"
 BACKUP_DIR="$HOME/.gemini_backup_$(date +%Y%m%d_%H%M%S)"
 GEMINI_REPO_URL="https://github.com/404kidwiz/google-antigravity-intelligent-agent-system.git"
 
+# Get the correct username from the repository
+GIT_USER=$(echo "$GEMINI_REPO_URL" | sed -E 's|https://github.com/([^/]+)/.*|\1|')
+if [ -z "$GIT_USER" ]; then
+    GIT_USER="404kidwiz"  # Fallback username
+fi
+
 # Parse command line arguments
 SKIP_DEPS=false
 DEV_MODE=false
 QUIET=false
+FORCE=false
 
 for arg in "$@"; do
     case $arg in
         --skip-deps) SKIP_DEPS=true ;;
         --dev) DEV_MODE=true ;;
         --quiet) QUIET=true ;;
+        --force) FORCE=true ;;
         --help) 
             echo "Enhanced Intelligent Agent System v2.0 Installer"
             echo ""
@@ -39,8 +48,11 @@ for arg in "$@"; do
             echo "  --skip-deps    Skip Python dependencies installation"
             echo "  --dev          Install in development mode"
             echo "  --quiet        Silent installation"
+            echo "  --force        Force reinstall (overwrite existing)"
             echo "  --help         Show this help message"
             echo ""
+            echo "Repository: https://github.com/$GIT_USER/google-antigravity-intelligent-agent-system"
+            echo "User: $GIT_USER"
             exit 0
             ;;
     esac
@@ -71,10 +83,11 @@ print_error() {
 
 print_header() {
     if [ "$QUIET" = false ]; then
-        echo -e "${CYAN}╔══════════════════════════════════════════════════════════════╗${NC}"
+        echo -e "${CYAN}╔════════════════════════════════════════════════════════════╗${NC}"
         echo -e "${CYAN}║     ENHANCED INTELLIGENT AGENT SYSTEM v2.0 INSTALLER       ║${NC}"
         echo -e "${CYAN}║   Hierarchical Orchestration + Memory + Analytics v2.0       ║${NC}"
-        echo -e "${CYAN}╚══════════════════════════════════════════════════════════════╝${NC}"
+        echo -e "${CYAN}║     Repository: github.com/$GIT_USER/antigravity-intelligent-agent    ║${NC}"
+        echo -e "${CYAN}╚════════════════════════════════════════════════════════════╝${NC}"
         echo ""
     fi
 }
@@ -85,8 +98,8 @@ check_requirements() {
     
     # Check Python
     if command -v python3 &> /dev/null; then
-        PYTHON_VERSION=$(python3 --version 2>&1 | cut -d' ' -f2)
-        PYTHON_MAJOR=$(echo $PYTHON_VERSION | cut -d'.' -f1)
+        PYTHON_VERSION=$(python3 --version 2>&1)
+        PYTHON_MAJOR=$(echo $PYTHON_VERSION | cut -d' ' -f2)
         PYTHON_MINOR=$(echo $PYTHON_VERSION | cut -d'.' -f2)
         
         if [ "$PYTHON_MAJOR" -ge 3 ] && [ "$PYTHON_MINOR" -ge 8 ]; then
@@ -130,11 +143,15 @@ check_requirements() {
 
 # Function to backup existing installation
 backup_existing() {
-    if [ -d "$INSTALL_DIR" ]; then
+    if [ -d "$INSTALL_DIR" ] && [ "$FORCE" = false ]; then
         print_status "Backing up existing installation..."
         mkdir -p "$BACKUP_DIR"
         cp -r "$INSTALL_DIR"/* "$BACKUP_DIR/" 2>/dev/null || true
         print_success "Backup created at $BACKUP_DIR"
+    elif [ "$FORCE" = true ]; then
+        print_status "Force mode: Removing existing installation..."
+        rm -rf "$INSTALL_DIR"
+        print_success "Existing installation removed"
     fi
 }
 
@@ -258,7 +275,7 @@ max_memory_entries = 10000
 EOF
 
     # Create expert library reference
-    cat > "$INSTALL_DIR/experts/library.json" << 'EOF'
+    cat > "$INSTALL_DIR/experts/library.json" << EOF
 {
   "version": "2.0",
   "total_experts": 138,
@@ -272,7 +289,9 @@ EOF
     "ai_ml": 7,
     "product": 15
   },
-  "last_updated": "$(date -Iseconds)"
+  "last_updated": "$(date -Iseconds)",
+  "repository": "https://github.com/$GIT_USER/google-antigravity-intelligent-agent-system",
+  "git_user": "$GIT_USER"
 }
 EOF
 
@@ -300,14 +319,16 @@ create_cli() {
 #!/bin/bash
 
 # Enhanced Intelligent Agent System CLI v2.0
+# Repository: https://github.com/$GIT_USER/google-antigravity-intelligent-agent-system
 
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-PYTHON_SCRIPT="$SCRIPT_DIR/meta_orchestrator.py"
+SCRIPT_DIR="\$(cd "\$(dirname "\${BASH_SOURCE[0]}")" && pwd)"
+PYTHON_SCRIPT="\$SCRIPT_DIR/meta_orchestrator.py"
 
 # Check if system is installed
-if [ ! -f "$PYTHON_SCRIPT" ]; then
-    echo "Error: Enhanced Intelligent Agent System not found"
-    echo "Please run the installation script first"
+if [ ! -f "\$PYTHON_SCRIPT" ]; then
+    echo "Error: Enhanced Intelligent Agent System v2.0 not found"
+    echo "Repository: https://github.com/$GIT_USER/google-antigravity-intelligent-agent-system"
+    echo "Please run installation script first"
     exit 1
 fi
 
@@ -316,8 +337,8 @@ VERBOSE=false
 ULTRATHINK=false
 SESSION_ID=""
 
-while [[ $# -gt 0 ]]; do
-    case $1 in
+while [[ \$# -gt 0 ]]; do
+    case \$1 in
         --verbose|-v)
             VERBOSE=true
             shift
@@ -327,11 +348,12 @@ while [[ $# -gt 0 ]]; do
             shift
             ;;
         --session|-s)
-            SESSION_ID="$2"
+            SESSION_ID="\$2"
             shift 2
             ;;
         --help|-h)
             echo "Enhanced Intelligent Agent System CLI v2.0"
+            echo "Repository: https://github.com/$GIT_USER/google-antigravity-intelligent-agent-system"
             echo ""
             echo "Usage: gemini [options] [request]"
             echo ""
@@ -349,38 +371,38 @@ while [[ $# -gt 0 ]]; do
             exit 0
             ;;
         *)
-            REQUEST="$*"
+            REQUEST="\$*"
             break
             ;;
     esac
 done
 
 # Read request from stdin if not provided
-if [ -z "$REQUEST" ]; then
+if [ -z "\$REQUEST" ]; then
     if [ -t 0 ]; then
         echo "Enter your request (Ctrl+D to finish):"
     fi
-    REQUEST=$(cat)
+    REQUEST=\$(cat)
 fi
 
 # Prepare Python command
-PYTHON_CMD="python3 \"$PYTHON_SCRIPT\""
+PYTHON_CMD="python3 \"\$PYTHON_SCRIPT\""
 
 # Add flags
-if [ "$VERBOSE" = true ]; then
-    PYTHON_CMD="$PYTHON_CMD --verbose"
+if [ "\$VERBOSE" = true ]; then
+    PYTHON_CMD="\$PYTHON_CMD --verbose"
 fi
 
-if [ "$ULTRATHINK" = true ]; then
-    PYTHON_CMD="$PYTHON_CMD --ultrathink"
+if [ "\$ULTRATHINK" = true ]; then
+    PYTHON_CMD="\$PYTHON_CMD --ultrathink"
 fi
 
-if [ -n "$SESSION_ID" ]; then
-    PYTHON_CMD="$PYTHON_CMD --session-id \"$SESSION_ID\""
+if [ -n "\$SESSION_ID" ]; then
+    PYTHON_CMD="\$PYTHON_CMD --session-id \"\$SESSION_ID\""
 fi
 
 # Execute
-echo "$REQUEST" | eval $PYTHON_CMD
+echo "\$REQUEST" | eval \$PYTHON_CMD
 EOF
 
     # Make CLI executable
@@ -396,11 +418,12 @@ setup_shell_integration() {
     # Create shell profile update
     PROFILE_UPDATE="$HOME/.gemini_shell_profile.sh"
     
-    cat > "$PROFILE_UPDATE" << 'EOF'
+    cat > "$PROFILE_UPDATE" << EOF
 # Enhanced Intelligent Agent System v2.0 Shell Integration
+# Repository: https://github.com/$GIT_USER/google-antigravity-intelligent-agent-system
 
 # Add to PATH
-export PATH="$HOME/.gemini:$PATH"
+export PATH="\$HOME/.gemini:\$PATH"
 
 # Aliases for convenience
 alias gemini="~/.gemini/gemini"
@@ -412,20 +435,21 @@ alias gemini-memory="~/.gemini/gemini 'what have we worked on before?'"
 alias gemini-help="~/.gemini/gemini --help"
 
 # Environment variables
-export GEMINI_HOME="$HOME/.gemini"
+export GEMINI_HOME="\$HOME/.gemini"
 export GEMINI_LOG_LEVEL="INFO"
 export GEMINI_DEBUG=false
+export GEMINI_REPO_USER="$GIT_USER"
 
 # Auto-completion (optional)
-if [ -n "$BASH_VERSION" ]; then
+if [ -n "\$BASH_VERSION" ]; then
     _gemini_completion() {
         local cur prev
-        cur="${COMP_WORDS[COMP_CWORD]}"
-        prev="${COMP_WORDS[COMP_CWORD-1]}"
+        cur="\${COMP_WORDS[COMP_CWORD]}"
+        prev="\${COMP_WORDS[COMP_CWORD-1]}"
         
-        case "$prev" in
+        case "\$prev" in
             gemini)
-                COMPREPLY=($(compgen -W "--verbose --ultrathink --session --help" -- "$cur"))
+                COMPREPLY=\$(compgen -W "--verbose --ultrathink --session --help" -- "\$cur")
                 ;;
             *)
                 COMPREPLY=()
@@ -437,14 +461,14 @@ fi
 EOF
 
     # Add to shell profile if not already there
-    if ! grep -q "Enhanced Intelligent Agent System" "$HOME/.bashrc" 2>/dev/null; then
+    if ! grep -q "Enhanced Intelligent Agent System v2.0" "$HOME/.bashrc" 2>/dev/null; then
         if [ -f "$HOME/.bashrc" ]; then
             echo "" >> "$HOME/.bashrc"
             echo "# Enhanced Intelligent Agent System v2.0" >> "$HOME/.bashrc"
             echo "source ~/.gemini_shell_profile.sh" >> "$HOME/.bashrc"
         fi
         
-        if [ -f "$HOME/.zshrc" ] && ! grep -q "Enhanced Intelligent Agent System" "$HOME/.zshrc" 2>/dev/null; then
+        if [ -f "$HOME/.zshrc" ] && ! grep -q "Enhanced Intelligent Agent System v2.0" "$HOME/.zshrc" 2>/dev/null; then
             echo "" >> "$HOME/.zshrc"
             echo "# Enhanced Intelligent Agent System v2.0" >> "$HOME/.zshrc"
             echo "source ~/.gemini_shell_profile.sh" >> "$HOME/.zshrc"
@@ -475,11 +499,12 @@ run_verification() {
 print_completion() {
     if [ "$QUIET" = false ]; then
         echo ""
-        echo -e "${GREEN}╔══════════════════════════════════════════════════════════════╗${NC}"
+        echo -e "${GREEN}╔════════════════════════════════════════════════════════════╗${NC}"
         echo -e "${GREEN}║           INSTALLATION COMPLETED SUCCESSFULLY!            ║${NC}"
-        echo -e "${GREEN}╚══════════════════════════════════════════════════════════════╝${NC}"
+        echo -e "${GREEN}╚════════════════════════════════════════════════════════════╝${NC}"
         echo ""
         echo -e "${CYAN}🚀 Enhanced Intelligent Agent System v2.0 is now installed!${NC}"
+        echo -e "${CYAN}🌐 Repository: https://github.com/$GIT_USER/google-antigravity-intelligent-agent-system${NC}"
         echo ""
         echo -e "${YELLOW}Quick Start:${NC}"
         echo -e "  ${BLUE}source ~/.gemini_shell_profile.sh${NC}  # Load environment"
@@ -520,6 +545,14 @@ print_completion() {
 main() {
     print_header
     
+    # Show repository info
+    if [ "$QUIET" = false ]; then
+        echo -e "${CYAN}Repository Information:${NC}"
+        echo -e "  ${BLUE}User:${NC} $GIT_USER"
+        echo -e "  ${BLUE}URL:${NC} https://github.com/$GIT_USER/google-antigravity-intelligent-agent-system"
+        echo ""
+    fi
+    
     # Check if running as root (not recommended)
     if [ "$EUID" -eq 0 ]; then
         print_error "Please do not run this installer as root"
@@ -549,7 +582,7 @@ main() {
 }
 
 # Error handling
-trap 'print_error "Installation failed. Check the error messages above."' ERR
+trap 'print_error "Installation failed. Check to error messages above."' ERR
 
 # Run main function
 main "$@"
