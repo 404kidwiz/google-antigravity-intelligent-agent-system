@@ -33,6 +33,15 @@ DEV_MODE=false
 QUIET=false
 FORCE=false
 
+# Add a special flag to help with curl execution
+INSTALLER_MODE="install"
+if [ -n "$1" ] && [ "$1" != "--skip-deps" ] && [ "$1" != "--dev" ] && [ "$1" != "--quiet" ] && [ "$1" != "--force" ] && [ "$1" != "--help" ]; then
+    # If first argument doesn't match known options, treat it as install request
+    INSTALLER_MODE="run"
+    REQUEST="$1"
+    shift
+fi
+
 for arg in "$@"; do
     case $arg in
         --skip-deps) SKIP_DEPS=true ;;
@@ -42,7 +51,7 @@ for arg in "$@"; do
         --help) 
             echo "Enhanced Intelligent Agent System v2.0 Installer"
             echo ""
-            echo "Usage: $0 [options]"
+            echo "Usage: $0 [options] [request]"
             echo ""
             echo "Options:"
             echo "  --skip-deps    Skip Python dependencies installation"
@@ -50,6 +59,9 @@ for arg in "$@"; do
             echo "  --quiet        Silent installation"
             echo "  --force        Force reinstall (overwrite existing)"
             echo "  --help         Show this help message"
+            echo ""
+            echo "Installation:"
+            echo "  $0 'build a react component'  # Install and run"
             echo ""
             echo "Repository: https://github.com/$GIT_USER/google-antigravity-intelligent-agent-system"
             echo "User: $GIT_USER"
@@ -402,7 +414,30 @@ if [ -n "\$SESSION_ID" ]; then
 fi
 
 # Execute
-echo "\$REQUEST" | eval \$PYTHON_CMD
+if [ "$INSTALLER_MODE" = "run" ] && [ -n "$REQUEST" ]; then
+    echo "$REQUEST" | eval $PYTHON_CMD
+elif [ "$INSTALLER_MODE" = "install" ]; then
+    # Run full installation
+    check_requirements
+    backup_existing
+    create_directories
+    if [ "$DEV_MODE" = false ]; then
+        install_dependencies
+    fi
+    install_core_files
+    create_config
+    create_cli
+    setup_shell_integration
+    run_verification
+    print_completion
+    
+    # Create marker file for successful installation
+    touch "$INSTALL_DIR/.installation_complete"
+    
+    print_success "Installation completed successfully! ✓"
+else
+    echo "$REQUEST" | eval $PYTHON_CMD
+fi
 EOF
 
     # Make CLI executable
