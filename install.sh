@@ -99,8 +99,8 @@ check_requirements() {
     # Check Python
     if command -v python3 &> /dev/null; then
         PYTHON_VERSION=$(python3 --version 2>&1)
-        PYTHON_MAJOR=$(echo $PYTHON_VERSION | cut -d' ' -f2)
-        PYTHON_MINOR=$(echo $PYTHON_VERSION | cut -d'.' -f2)
+        PYTHON_MAJOR=$(echo $PYTHON_VERSION | sed 's/Python \([0-9]*\)\.\([0-9]*\).*/\1/')
+        PYTHON_MINOR=$(echo $PYTHON_VERSION | sed 's/Python \([0-9]*\)\.\([0-9]*\).*/\2/')
         
         if [ "$PYTHON_MAJOR" -ge 3 ] && [ "$PYTHON_MINOR" -ge 8 ]; then
             print_success "Python $PYTHON_VERSION found ✓"
